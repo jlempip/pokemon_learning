@@ -1,18 +1,21 @@
+# Weaknesses and resistances that will affect how moves interact with a specific pokemon
 weakness_dict = {'fire': 'water', 'water': 'grass', 'grass': 'fire'}
 resistance_dict = {'water': 'fire', 'fire': 'grass', 'grass': 'water'}
 
+# Create Pokemon-class that serves as ancestor for all pokemons
 class Pokemon:
-    def __init__(self, name, level=1, pokemon_type='Normal', curr_hp=0, knocked_out=True, moves={'Scratch': 10}):
+    def __init__(self, name, level=1, pokemon_type='Normal', current_hp=0, knocked_out=True, moves={'Scratch': 10}):
         self.name = name
         self.level = level
         self.type = pokemon_type
-        self.mhp = 10 * self.level
-        self.chp = curr_hp
+        self.mhp = 10 * self.level # Max hitpoints of this pokemon
+        self.chp = current_hp
         self.ko = knocked_out
         self.moves = moves
 
+    # Method used for taking damage
     def lose_health(self, dmg):
-        self.chp = self.chp - dmg
+        self.chp -= dmg
         if self.chp <= 0:
             print("{name} now has 0 left.".format(name=self.name, chp=self.chp))
             print("{name} got knocked out!".format(name=self.name))
@@ -21,6 +24,16 @@ class Pokemon:
         else:
             print("{name} now has {chp} left.".format(name=self.name, chp=self.chp))
 
+    # Method for healing a pokemon
+    def gain_health(self, healing_received):
+        self.chp += healing_received
+        if self.chp > self.mhp:
+            self.chp = self.mhp
+            print("{name} was healed and is back at full hp".format(name=self.name))
+        else:
+            print("{name} was healed and now has {chp}".format(name=self.name, chp=self.chp))
+
+    # Method used for reviving a pokemon whose self.ko=True
     def revive(self, heal):
         self.chp += heal
         self.knocked_out = False
