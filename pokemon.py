@@ -2,7 +2,7 @@
 weakness_dict = {'fire': 'water', 'water': 'grass', 'grass': 'fire'}
 resistance_dict = {'water': 'fire', 'fire': 'grass', 'grass': 'water'}
 
-# Create Pokemon-class that serves as ancestor for all pokemons
+# Pokemon-class serves as ancestor for all pokemons
 class Pokemon:
     def __init__(self, name, level=1, pokemon_type='Normal', current_hp=0, knocked_out=True, moves={'Scratch': 10}):
         self.name = name
@@ -41,6 +41,7 @@ class Pokemon:
             self.chp = self.mhp
         print("{name} is back with {chp}".format(name=self.name, chp=self.chp))
 
+    # Method used for attacking another pokemon
     def attack(self, target, move):
         if self.type == weakness_dict[target.type]:
             print("It's super effective!")
@@ -52,29 +53,57 @@ class Pokemon:
             print("It hits!")
             target.lose_health(self.moves[move])
 
+# Instantiating some pokemons for testing
 charmander = Pokemon('Charmander', 5, 'fire', 50, False, {'Scratch': 10, 'Fire Breath': 30})
-#charmander2 = Pokemon('Charmander2', 5, 'fire', 50, False, {'Scratch': 10, 'Fire Breath': 30})
 squirtle = Pokemon('Squirtle', 5, 'water', 5, False, {'Tackle': 10, 'Water Gun': 30})
 bulbasaur = Pokemon('Bulbasaur', 5, 'grass', 50, False, {'Wine Whip': 10, 'Seedstorm': 30})
+#charmander2 = Pokemon('Charmander2', 5, 'fire', 50, False, {'Scratch': 10, 'Fire Breath': 30})
 
+# Using some pokemon-methdods for testing
 #charmander.attack(squirtle, 'Scratch')
 #squirtle.attack(charmander, 'Water Gun')
 #charmander.attack(charmander2, 'Fire Breath')
 
+# Trainer-class serves as base for player-character and NPCs
 class Trainer:
     def __init__(self, name, pokemons, potions, active_pokemon=0):
         self.name = name
         self.pokemons = pokemons
-        self.active = active_pokemon
         self.potions = potions
+        self.active = active_pokemon
+        
 
+    # Used for targeting and attacking other trainers
     def attack_trainer(self, target_trainer, move):
         self.pokemons[self.active].attack(target_trainer.pokemons[target_trainer.active], move)
 
+    # Used for using potions
     def use_potion(self, potion):
-        pass
+        if potion in self.potions:
+            self.pokemons[self.active].gain_health(self.potions[potion])
+            self.potions.pop(potion)
+        else:
+            print("No such potion in inventory.")
 
-ash = Trainer('Ash', [charmander, squirtle], 0, {'hp_potion': 10})
-gary = Trainer('Gary', [bulbasaur, squirtle], 0, {'hp_potion': 10, 'super_hp_potion': 30})
+    # Used for switching pokemons
+    def switch_pokemon(self, new_active_pokemon):
+        if new_active_pokemon < len(self.pokemons):
+            print("Come back {old}, you've had enough".format(old=self.pokemons[self.active].name))
+            self.active = new_active_pokemon
+            print("Go {new}, I choose you!".format(new=self.pokemons[self.active].name))
+        else:
+            print("That pokemon does not exist.")
+    
+    # Used for checking what items the trainer has in inventory
+    def check_inventory(self):
+        print(self.potions)
 
-ash.attack_trainer(gary, 'Scratch')
+# Instantiating some trainers for testing
+ash = Trainer('Ash', [charmander, squirtle], {'hp_potion': 10}, 1)
+gary = Trainer('Gary', [bulbasaur, squirtle], {'hp_potion': 10, 'super_hp_potion': 30}, 0)
+
+# Using some trainer-methods for testing
+# ash.attack_trainer(gary, 'Scratch')
+# ash.use_potion("hp_potion")
+# ash.check_inventory()
+ash.switch_pokemon(0)
